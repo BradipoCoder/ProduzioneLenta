@@ -1,0 +1,34 @@
+/* less/print.less */
+
+#toolbar,
+header,
+.hide-in-print,
+.wrapper-header-colored,
+.wrapper-top,
+.wrapper-footer{
+  display: none;
+}
+
+.view-prod2,
+.view-prod1{
+  .view-header{
+    display: none;
+  }
+  th img{
+    display: none;
+  }
+}
+
+a[href]:after {
+  content: none !important;
+}
+
+
+.main-container{
+  padding-top: 0;
+}
+
+body.kadmin-open.navbar-is-fixed-top{
+  padding-top: 0 !important;
+}
+

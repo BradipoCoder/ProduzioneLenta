@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_commerce_price_formatted_components_alter().
+ */
+function commerce_fix_label_commerce_price_formatted_components_alter(&$components, $price, $entity) {
+  foreach ($components as &$component) {
+    $component['title'] = t($component['title']);
+  }
+}

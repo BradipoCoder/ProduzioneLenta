@@ -1,0 +1,5 @@
+name = Slow Countdown
+description = Countdown ogni 15 gg per ogni ordine
+package = Produzione Lenta
+core = 7.x
+version = 7.x-1.x-dev

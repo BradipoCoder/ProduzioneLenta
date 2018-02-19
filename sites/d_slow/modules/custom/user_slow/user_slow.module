@@ -1,0 +1,18 @@
+<?php
+
+/**
+* Override the printing of the forms in the user edit page
+*/
+function user_slow_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'user_profile_form' && arg(3) == NULL){
+    global $user;
+    $roles = $user->roles;
+    if (!isset($roles[3])){
+      $form['locale']['#access'] = FALSE;
+      $form['timezone']['#access'] = FALSE;
+      $form['picture']['#access'] = FALSE;
+    } else {
+      //dpm($form);
+    }
+  }
+}

@@ -1,0 +1,5 @@
+name = Pagina per stampare i buoni sconto
+description = Pagina per stampare i buoni sconto
+package = Produzione Lenta
+core = 7.x
+version = 7.x-1.x-dev

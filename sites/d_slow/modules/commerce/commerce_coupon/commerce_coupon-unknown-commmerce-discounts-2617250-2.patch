@@ -1,0 +1,17 @@
+diff --git a/commerce_coupon.module b/commerce_coupon.module
+index c6ef502..97c2133 100644
+--- a/commerce_coupon.module
++++ b/commerce_coupon.module
+@@ -1237,8 +1237,10 @@ function commerce_coupon_order_discount_ids($order) {
+   }
+ 
+   // Add the set of discounts directly referenced on the order.
+-  foreach ($order_wrapper->commerce_discounts->raw() as $discount_id) {
+-    $order_discount_ids[] = $discount_id;
++  if (isset($order_wrapper->commerce_discounts)) {
++    foreach ($order_wrapper->commerce_discounts->raw() as $discount_id) {
++      $order_discount_ids[] = $discount_id;
++    }
+   }
+ 
+   $order_discount_ids = array_unique($order_discount_ids);

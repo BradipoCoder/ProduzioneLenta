@@ -1,0 +1,228 @@
+/* less/typo.less */
+
+// ** MIXINS **
+// ------------
+ 
+.text-color(@color){
+  color: @color;
+  .link-color(@color);
+}
+
+.link-color(@color){
+  a{
+    .color-and-hover(@color);
+  } 
+}
+
+
+.color-and-hover(@color){
+  color: @color;
+  &:hover,
+  &:focus,
+  &:active{
+    color: darken(@color,10%);
+  }  
+}
+
+// ** HEADINGS **
+// --------------
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{
+  .link-color(@headings-color);
+}
+
+h5, .h5,
+h3, .h3{
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+h5, .h5{
+  color: @gray-light;
+}
+
+h1, .h1{
+  .margin-b(1.5);
+}
+
+// h4, .h4{
+//   .text-color(@brand-primary);
+// }
+
+// ** FONT WEIGHT **
+// -----------------
+body {
+  font-weight: 300;
+}
+
+// ** BOLD AND LINKS **
+// --------------------
+
+strong, b,
+.text-bold{
+  font-weight: 400;
+  color: @gray-darker;
+}
+
+a{
+  .transition(all ease-in-out .2s);
+}
+
+a:hover,
+a:focus,
+a:active{
+  text-decoration: none;
+}
+
+.hot-link{
+  text-transform: uppercase;
+  text-decoration: underline;
+  font-weight: 400;
+  color: @gray-darker;
+  letter-spacing: 2px;
+  font-size: @font-size-small;
+}
+
+// ** BLOCKQUOTE **
+// ----------------
+// * border-color: see variable.less:825
+
+blockquote{
+  .margin-v(1);
+  font-size: @font-size-large;
+}
+
+// ** LEAD **
+// ----------
+// * lead below sm . see type.less:62
+
+.lead{
+  font-size: (@font-size-base * 1.2);
+  color: @gray-dark;
+  font-weight: 400;
+}
+
+// ** HR **
+// --------
+hr.short{
+  max-width: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  border-top: 2px solid @gray-lighter;
+}
+
+hr.mid{
+  width: 50%;
+  margin-left: 0;
+  border-top: 2px solid @gray-lighter;
+}
+
+// ** NEGATIVE **
+// --------------
+
+.negative{
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6{
+    .text-color(#fff);
+  }
+
+  strong, b,
+  .text-bold,
+  p{
+    color: #fff;
+  }
+
+  .link-color(#fff);
+
+  .form-control{
+    background: none;
+    border: 1px solid fade(#fff, 50%);
+    color: #fff;
+  }
+
+  .webform-component label{
+    font-weight: 400;
+    color: #fff;
+  }
+
+  .form-control::-webkit-input-placeholder { color: white; }
+  .form-control:-moz-placeholder { color: white; }
+  .form-control::-moz-placeholder { color: white; }
+  .form-control:-ms-input-placeholder { color: white; }
+}
+
+// ** NAV BAR **
+// -------------
+
+.navbar-default{
+  .navbar-nav li a{
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: @font-size-h5;
+    letter-spacing: 2px;
+  }
+}
+
+// ** LINK INSIDE COPY **
+// ----------------------
+
+.field-name-body,
+.field-name-field-short,
+.copy{
+  .link-color(darken(@brand-primary, 10%));
+
+  .btn-primary{
+    .color-and-hover(@gray-darker);
+  }
+}
+
+// ** WEBFORM **
+// -------------
+// Help text
+
+.webform-client-form{
+  .description{
+    font-size: @font-size-small;
+    .margin-t(0.25);
+  }
+}
+
+.commerce-add-to-cart{
+  label,
+  .form-control{
+    font-size: @font-size-small; 
+  } 
+}
+
+// ** FOOTER **
+// ------------
+
+.block-footer{
+  h5{
+    .text-color(#fff);
+    text-transform: uppercase;
+  }
+  hr{
+    border-color: @gray;
+  }
+}
+
+.footer-common-link{
+  p{
+    .text-color(@gray-light);
+  }
+}
+
+// ** BREADCRUMB **
+// ----------------
+
+.breadcrumb{
+  text-align: center;
+  font-size: @font-size-small;
+  .margin-v(0.5);
+  //.text-color(#fff);
+  //& > .active {
+  //  color: #fff;
+  //}
+}

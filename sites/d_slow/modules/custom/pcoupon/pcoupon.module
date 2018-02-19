@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * Implementx hook_menu()
+ */
+
+function pcoupon_menu(){
+  $items['code/print'] = array(
+    'page callback' => 'pcoupon_page',
+    'access arguments' => array('access content'),
+    'title' => 'Buono regalo',
+  );
+
+  $items['gifts'] = array(
+    'page callback' => 'pcoupon_gits_page',
+    'access arguments' => array('access content'),
+    'title' => 'Scarica i tuoi buoni regalo', 
+  );
+
+  return $items;
+}
+
+function pcoupon_page(){
+
+  $content = array(
+    '#markup' => '<div class="text-center margin-b-2">Url non valido</div>',
+  );
+
+  if (isset($_GET['code'])){
+    $code = $_GET['code'];
+  }
+
+  if (isset($_GET['did'])){
+    $did = $_GET['did'];
+  }
+
+  $js = libraries_get_path('clipboard') . '/clipboard.min.js';
+  drupal_add_js( $js , array('group' => JS_LIBRARY, 'weight' => 1));
+
+  // Add JS
+  $js = drupal_get_path('module', 'pcoupon') . '/js/pcoupon.js';
+  drupal_add_js( $js , array('group' => JS_LIBRARY, 'weight' => 2));
+
+  if (isset($code) && isset($did)){
+    
+    // Che tipo di sconto è?
+    $discount = entity_load('commerce_discount', array($did));
+    $first = array_keys($discount);
+    $f = $first[0];
+    $discount = $discount[$f];
+
+    global $base_url;
+    $src = $base_url . '/' . drupal_get_path('theme', 'slow') . '/img/coupon-logo.svg';
+    $img = '<img src="' . $src . '" class="coupon-logo"/>';
+
+
+    $opt = array(
+      'query' => array(
+        'code' => $code,
+        'did' => $did,
+        'present' => '1',
+      ),
+      'absolute' => TRUE,
+    );
+
+    $content = array(
+      'logo' => array(
+        '#markup' => $img,
+      ),
+      'discount_title' => array(
+        '#markup' => $discount->label,
+      ),
+      'code' => array(
+        '#markup' => $code,
+      ),
+      'desc' => _slow_get_taxonomy_text(206),
+      'help' => _slow_get_taxonomy_text(207),
+      'clip_url' => array(
+        '#markup' => url('code/print', $opt),
+      ),
+    );
+  }
+
+  if (isset($_GET['present'])){
+    unset($content['help']);
+  }
+
+  $data = array(
+    '#theme' => 'pcoupon',
+    '#content' => $content,
+  );
+  return $data;
+}
+
+function pcoupon_gits_page(){
+  if (isset($_GET['mail']) && $_GET['id']){
+    $order_id = $_GET['id'];
+    $order = commerce_order_load_by_number($order_id);
+
+    if ($order){
+      if ($order->mail == $_GET['mail']){
+        $data = _slow_check_items_types($order);
+        if (!empty($data['gifts'])){
+          $content['gifts'] = _slow_create_gifts_content($order, $data['gifts']);
+        } else {
+          return drupal_not_found(); 
+        }
+      }
+    } else {
+      return drupal_not_found(); 
+    }
+    return $content;
+  } else {
+    return drupal_not_found();  
+  }
+}
+
+/**
+ * Implementes hook_theme();
+ */
+function pcoupon_theme(){
+  return array(
+    'pcoupon' => array(
+      // use a template and give the template's name.
+      'template' => 'pcoupon',
+      'variables' => array(
+        'content' => NULL,
+      ),
+      'pattern' => 'pcoupon__',
+    ),
+  );
+}
+

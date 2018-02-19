@@ -1,0 +1,38 @@
+/* less/media.less */
+
+@m-width: 250px;
+
+.wrapper-media{
+  .clearfix();
+  position: relative;
+}
+
+.media-content{
+  .size(1);
+  margin-left: @m-width;
+  min-height: @m-width;
+  padding: @size;
+}
+
+.media-img{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: block;
+  width: @m-width;
+  min-height: @m-width;
+  background-size: cover;
+}
+
+@media (max-width: @screen-xs-max){
+  .media-img{
+    display: none;
+  }
+  .media-content{
+    margin-left: auto;
+    min-height: auto;
+    padding-top: 0;
+    margin-bottom: 0;
+  }
+}

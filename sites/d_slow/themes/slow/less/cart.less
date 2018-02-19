@@ -1,0 +1,154 @@
+/* less/cart.less */
+
+.commerce-add-to-cart{
+  .form-submit{
+    .margin-t(0.5);
+  }
+}
+
+.commerce-line-item-views-form{
+  .views-field-field-img{
+    min-width: 60px;
+    img{
+      width: 60px;  
+    }
+  }
+  .views-field-line-item-title{
+    @media (max-width: @grid-float-breakpoint){
+      width: 120px;
+    }
+    a{
+      white-space: normal;
+    }
+  }
+  td.views-field-line-item-title{
+    @media (max-width: @grid-float-breakpoint){
+      font-size: 13px;
+    }
+  }
+}
+
+.views-table{
+  @media (max-width: @grid-float-breakpoint){
+    th,
+    td{
+      font-size: @font-size-small;
+      .form-control{
+        font-size: @font-size-small;
+        height: 30px; 
+      }
+    }
+  }
+}
+
+.l-size{
+  font-size: @font-size-small;
+}
+
+.l-size-203{
+  display: none;
+}
+
+.delete-line-item{
+  font-size: 20px;
+  line-height: 25px;
+}
+
+// ** NAV BAR CART **
+// ------------------
+
+li.slow-cart a.a-cart{
+  padding: 10px 15px;
+  display: block;
+  color: @navbar-default-link-color;
+  line-height: @line-height-computed;
+
+  @media (min-width: @grid-float-breakpoint){
+    padding-top:    @navbar-padding-vertical;
+    padding-bottom: @navbar-padding-vertical; 
+  }
+}
+
+// ** CHECKOUT **
+// --------------
+
+.form-item-customer-profile-billing-commerce-customer-profile-copy{
+  .placeholder{
+    text-transform: lowercase;
+  }
+}
+
+// ** REVIEW **
+// ------------
+
+.commerce-order-handler-area-order-total .commerce-price-formatted-components{
+  width: 50%;
+  @media (max-width: @grid-float-breakpoint){
+    width: 100%;  
+  }
+}
+
+// ** PAYMENTS **
+// --------------
+
+.form-item-commerce-payment-payment-method{
+  img{
+    display: inline;
+  }
+
+  label{
+    font-size: @font-size-small;
+    img{
+      position: relative;
+      top: -2px;
+    }
+  }
+
+  .commerce-paypal-icons{
+    margin-top: 5px;
+    img{
+      top: 0px;
+    }
+    .label{
+      background: @brand-success;
+      padding: .2em .6em .3em;
+    }
+  }
+}
+
+#payment-details{
+  display: none;
+}
+
+// ** REDIRECT **
+// --------------
+
+.checkout-help{
+  .margin-v(1);
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#commerce-paypal-wps-redirect-form{
+  text-align: center;
+}
+
+// ** USER PASS RESET **
+// ---------------------
+
+#user-pass-reset{
+  max-width: 750px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+// ** ORDER **
+// -----------
+
+.field-name-commerce-customer-shipping,
+.field-name-commerce-customer-billing{
+  .margin-b(1);
+}
+

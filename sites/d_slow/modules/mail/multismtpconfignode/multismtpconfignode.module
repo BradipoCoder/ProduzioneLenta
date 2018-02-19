@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the MultiSmtpConfigNode feature.
+ */
+
+include_once 'multismtpconfignode.features.inc';

@@ -1,0 +1,225 @@
+<?php
+
+/**
+ * preprocess node blog page
+ */
+function s_archive_preprocess_node(&$vars){
+  if ($vars['nid'] == 3 && $vars['view_mode'] == 'full'){
+    _s_archive_preprocess_node_blog_full($vars);
+  }
+}
+
+function _s_archive_preprocess_node_blog_full(&$vars){
+  // Visualizzo tutti i post con pager
+  $nodes = _get_all_post_paged('news');
+  $vars['content']['posts']['#prefix'] = '<div class="row">';
+  $vars['content']['posts']['#suffix'] = '</div>';
+  foreach ($nodes as $key => $node) {
+    $vars['content']['posts'][$key] = node_view($node, 'child');
+  }
+  $vars['content']['pager'] = array(
+    '#prefix' => '<hr>',
+    'data' => array(
+      '#theme' => 'pager',
+      '#tags' => array(),
+    ),
+    '#weight' => 10,
+  );
+
+  _s_archive_sidebar($vars);
+}
+
+function _s_archive_sidebar(&$vars){
+  $vars['content']['sidebar']['first']['#prefix'] = '<div class="well">';
+  $vars['content']['sidebar']['first']['#suffix'] = '</div>';
+  $vars['content']['sidebar']['first']['title']['#markup'] = '<h3 class="text-center">Argomenti del blog</h3><hr class="short">';
+  $vars['content']['sidebar']['first']['data'] = _s_archive_category_list();
+}
+
+/**
+ * Categorie Blog
+ */
+function _s_archive_category_list(){
+  $query = db_select('taxonomy_term_data', 't');
+  $query->fields('t', array('tid','name'));
+  $query->condition('t.vid', 5, '=');
+  $query->join('taxonomy_index', 'ti', 't.tid = ti.tid');
+  $result = $query->execute();
+
+  foreach ($result as $item) {
+    $tid = $item->tid;
+    $categories[$tid]['name'] = $item->name;
+    if (isset($categories[$tid]['number'])){
+      $categories[$tid]['number'] = $categories[$tid]['number'] + 1;
+    } else {
+      $categories[$tid]['number'] = 1;
+    }
+  }
+  
+  foreach ($categories as $tid => $category) {
+    $text = $category['name'] . ' (' . $category['number'] . ')'; 
+    $data[$tid] = array(
+      '#markup' => '<p class="small text-center">' . l($text, 'taxonomy/term/' . $tid) . '</p>',
+    );
+  }
+
+  return $data;
+}
+
+/**
+ * Tags blog
+ */
+function _archive_tags_list(){
+  $query = db_select('taxonomy_term_data', 't');
+  $query->fields('t', array('tid','name'));
+  $query->condition('t.vid', 2, '=');
+  $query->join('taxonomy_index', 'ti', 't.tid = ti.tid');
+  $result = $query->execute();
+
+  $tags = false;
+  foreach ($result as $item) {
+    $tid = $item->tid;
+    $tags[$tid]['name'] = $item->name;
+    if (isset($tags[$tid]['number'])){
+      $tags[$tid]['number'] = $tags[$tid]['number'] + 1;
+    } else {
+      $tags[$tid]['number'] = 1;
+    }
+  }
+
+  $opt['attributes']['class'] = array('btn','btn-default', 'btn-flat');
+
+  $data['tag'] = array(
+    '#prefix' => '<div class="archive-tags"><ul class="archive-tags-ul">',
+    '#suffix' => '</ul></div>',
+  );
+  
+  if ($tags){
+    foreach ($tags as $tid => $tag) {
+      $text = $tag['name'];
+      $data['tag'][$tid] = array(
+        '#markup' => '<li>' . l($text, 'taxonomy/term/' . $tid, $opt) . '</li>',
+      );
+    } 
+  }
+
+  return $data;
+}
+
+/**
+ * Accordion Blog Archive view
+ */
+function _s_archive_accordion_list(){
+  $nodes = get_all_post('news');
+
+  $possible_years = array();
+  $possible_months = array();
+  $archive = array();
+  
+  foreach ($nodes as $node) {
+    $title   = $node->title;
+    $date = strtotime($node->field_date['und'][0]['value']);
+    $path    = url('node/' . $node->nid);
+    $year    = date("Y", $date);
+    $month   = date("F", $date);
+    
+    if (in_array($year, $possible_years) == FALSE) {
+      $possible_years[] = $year;
+    }
+    
+    if (in_array($month, $possible_months) == FALSE) {
+      $possible_months[] = $month;
+    }
+    
+    $archive[$year][$month][] = array(
+      'title' => $title,
+      'path' => $path,
+      'nid' => $node->nid,
+    );
+  }
+
+  // ANNI
+  foreach ($archive as $k_year => $mesi) {
+    $Ypanels[$k_year] = array(
+      '#theme' => 'smiletrap_panel',
+      '#id' => 'p-' . $k_year,
+      '#title' => $k_year,
+      '#content' => array(
+        '#theme' => 'smiletrap_accordion',
+        '#id' => 'ay-' . $k_year,
+      ),
+    );
+
+    // MESI
+    $Mpanels = array();
+    foreach ($mesi as $k_month => $posts) {
+
+      $ym = $k_year . '-' . $k_month;
+      $count = count($posts);
+      $titolo_mese = '<h4 class="panel-title">' . $k_month . ' (' . $count  . ')</h4>';
+
+      $Mpanels[$k_month] = array(
+        '#theme' => 'smiletrap_panel',
+        '#id' => 'am-' . $ym,
+        '#title' => $titolo_mese,
+      );
+
+      // POST
+      if (is_array($posts) == TRUE) {
+        foreach ($posts as $k_post => $post) {
+          if (is_array($post) == TRUE) {
+            $Mpanels[$k_month]['#content'][$k_post] = array(
+              '#markup' => '<p class="small">' . l($post['title'], 'node/' . $post['nid']) . '</p>',
+            );
+          }
+        }
+      }
+    }
+    $Ypanels[$k_year]['#content']['#elements'] = $Mpanels;
+    $Ypanels[$k_year]['#content']['#prefix'] = '<div class="sub-archive">';
+    $Ypanels[$k_year]['#content']['#suffix'] = '</div>';
+  }
+  
+  $data['accordion'] = array(
+    '#theme' => 'smiletrap_accordion',
+    '#id' => 'blog-archive-accordion',
+    '#elements' => $Ypanels,
+    '#options' => array(
+      'fade' => TRUE,
+    ),
+  );
+
+  return $data;
+}
+
+/**
+ * Get all post from the blog
+ */
+function get_all_post($type){
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('status', 1)
+    ->propertyCondition('type', array($type))
+    ->fieldOrderBy('field_date', 'value', 'DESC')
+    ->range(0, 9999);
+  $result = $query->execute();
+  $nodes = node_load_multiple(array_keys($result['node']));
+  return $nodes;
+}
+
+/**
+ * Get all post from the blog
+ */
+function _get_all_post_paged($type){
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('status', 1)
+    ->propertyCondition('type', array($type))
+    ->fieldOrderBy('field_date', 'value', 'DESC')
+    ->pager(4);
+  $result = $query->execute();
+  $nodes = node_load_multiple(array_keys($result['node']));
+  return $nodes;
+}

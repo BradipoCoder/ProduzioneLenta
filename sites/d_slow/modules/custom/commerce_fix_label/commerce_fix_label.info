@@ -1,0 +1,5 @@
+name = Commerce Fix Label Translation
+description = Traduce alcune label che non sono tradotte
+package = Mekit
+core = 7.x
+version = 7.x-1.x-dev

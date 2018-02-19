@@ -1,0 +1,401 @@
+<?php
+
+
+/**
+ * Implements hook_form_alter()
+ */
+function commerce_slow_form_alter(&$form, $form_state, $form_id){
+  $chunk = substr($form_id, 0, 30);
+  if ($chunk && $chunk == 'commerce_cart_add_to_cart_form'){
+    _commerce_slow_add_to_cart_form_alter($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function _commerce_slow_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+
+  if (isset($form['product_id']['#value'])){
+    $pid = $form['product_id']['#value'];
+
+    $product = $form_state['default_product'];
+
+    if ($product->type == 'product'){
+      // Tolgo taglia unica dalle magliette e felpe a meno che non sia settato specificamente
+      
+      if (isset($product->field_ref_size['und'][0]['tid']) && $product->field_ref_size['und'][0]['tid'] == '175'){
+        // Solo taglia unica
+        $size = array(
+          92,
+        );
+        foreach ($form['line_item_fields']['field_ref_psize']['und']['#options'] as $key => $value) {
+          if (!in_array($key, $size)){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options'][$key]);
+          }
+        }
+      } else {
+        // To do, riscrivere come gli altri più in basso e uniformare tutto con !in_array()
+        if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['92'])){
+          //Taglia unica
+          unset($form['line_item_fields']['field_ref_psize']['und']['#options']['92']);
+        }
+        // To do, riscrivere come gli altri più in basso e uniformare tutto con !in_array()
+        if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['203'])){
+          //Indifferente dalla taglia
+          unset($form['line_item_fields']['field_ref_psize']['und']['#options']['203']);
+        } 
+      }
+    }
+
+    // Zaini (prodotti a taglia unica)
+    if ($product->type == 'product2'){
+      if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['92'])){
+        $form['line_item_fields']['field_ref_psize']['und']['#options'] = array(
+          '92' => $form['line_item_fields']['field_ref_psize']['und']['#options']['92'],
+        );  
+      }
+      $form['quantity']['#disabled'] = true;
+    }
+
+    if (isset($product->field_ref_size['und'][0]['tid'])){
+      $tid = $product->field_ref_size['und'][0]['tid'];
+
+      switch ($tid) {
+
+        case '4':
+          // Da XS a XXL | DONNA
+          _remove_child_size($form);
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['66'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['66']);
+            //XXS
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['36'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['36']);
+            //XXXL
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['88'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['88']);
+            //XXXXL
+          }
+          break;
+
+        case '5':
+          // Da 3 a 12 anni
+          _remove_adult_size($form);
+          break;
+
+        case '7':
+          // Da XS a XXXL
+          _remove_child_size($form);
+
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['88'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['88']);
+            //XXXXL
+          }
+          break;
+
+        case '67':
+          // Da XXS a L
+          _remove_child_size($form);
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['34'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['34']);
+            //XL
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['35'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['35']);
+            //XXL
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['36'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['36']);
+            //XXXL
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['88'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['88']);
+            //XXXXL
+          }
+          break;
+
+        case '89':
+          // Da S a XXXXL
+          _remove_child_size($form);
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['66'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['66']);
+            //XXS
+          }
+          if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['30'])){
+            unset($form['line_item_fields']['field_ref_psize']['und']['#options']['30']);
+            //XS
+          }
+          break;
+
+        case '120':
+          // Solo M e L
+          $size = array(
+            32, // M 
+            33, // L
+          );
+          foreach ($form['line_item_fields']['field_ref_psize']['und']['#options'] as $key => $value) {
+            if (!in_array($key, $size)){
+              unset($form['line_item_fields']['field_ref_psize']['und']['#options'][$key]);
+            }
+          }
+
+          break;
+        
+        case '114';
+          // Da S a XXL
+          $size = array(
+            31, // S
+            32, // M
+            33, // L
+            34, // XL
+            35, // XXL
+          );
+
+          foreach ($form['line_item_fields']['field_ref_psize']['und']['#options'] as $key => $value) {
+            if (!in_array($key, $size)){
+              unset($form['line_item_fields']['field_ref_psize']['und']['#options'][$key]);
+            }
+          }
+
+          break;
+
+        case '149';
+          // Da XS a XL (http://produzionelenta.it/admin/structure/taxonomy/size_p)
+          $size = array(
+            30, // XS
+            31, // S
+            32, // M
+            33, // L
+            34, // XL
+          );
+
+          foreach ($form['line_item_fields']['field_ref_psize']['und']['#options'] as $key => $value) {
+            if (!in_array($key, $size)){
+              unset($form['line_item_fields']['field_ref_psize']['und']['#options'][$key]);
+            }
+          }
+
+          break;
+
+        default:
+          # code...
+          break;
+      }
+    }
+  }
+
+  // Per qualche strano motivo, l'id dei regali è gestito in modo diverso dal form
+  // Anche l'ajax combina qualcosa di strano.. il markup cambia. come mai?
+  if (isset($form['product_id']['#default_value'])){
+    $pid = $form['product_id']['#default_value'];
+    $product = $form_state['default_product'];
+ 
+    // Regali (prodotti senza taglia)
+    if ($product->type == 'gift'){
+      if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['203'])){
+        $form['line_item_fields']['field_ref_psize']['und']['#options'] = array(
+          '203' => $form['line_item_fields']['field_ref_psize']['und']['#options']['203'],
+        );
+        $form['line_item_fields']['field_ref_psize']['#access'] = false; 
+      }
+    }
+
+  }
+
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options'])){
+    $form['line_item_fields']['field_ref_psize']['und']['#options']['_none'] = '- Seleziona la taglia -';
+  }
+
+  // Ho cambiato il colore del submit nel tema slow/include/commerce.php
+}
+
+function _remove_child_size(&$form){
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['37'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['37']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['38'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['38']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['39'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['39']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['40'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['40']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['41'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['41']);
+  }
+}
+
+function _remove_adult_size(&$form){
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['30'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['30']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['31'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['31']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['32'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['32']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['33'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['33']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['34'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['34']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['35'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['35']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['36'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['36']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['66'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['66']);
+  }
+  if (isset($form['line_item_fields']['field_ref_psize']['und']['#options']['88'])){
+    unset($form['line_item_fields']['field_ref_psize']['und']['#options']['88']);
+  }
+}
+
+function commerce_slow_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  // Solo per le maglie
+  if ($entity_form['#entity_type'] == 'commerce_product' && $entity_form['#bundle'] == 'product') {
+    
+    // Fieldset inutili
+    $entity_form['product_attributes']['#type'] = 'container';
+    $entity_form['product_details']['#type'] = 'container';
+
+    if (isset($entity_form['#entity']->product_id)){
+      // Prodotto esistente
+      // Forse bisognerebbe usare la proprietà is_new?
+    } else {
+      _commerce_slow_alter_product_creation($entity_form, $form_state);
+    }
+
+    _commerce_slow_alter_product_sku_by_color($entity_form, $form_state);
+  }
+}
+
+/**
+ * Altera il form tramite ajax per ricavare il codice più il color
+ */
+function _commerce_slow_alter_product_sku_by_color(&$entity_form, &$form_state){
+  //global $user;
+  //if ($user->uid == 1){
+
+    $node_product = $form_state['node'];
+
+    $markup_id = 'commerce-slow-ajax-';
+    if (isset($entity_form['#entity']->product_id)){
+      $markup_id .= $entity_form['#entity']->product_id;
+    } else {
+      $markup_id .= 'new';
+    }
+
+    $entity_form['#prefix'] = '<div id="' . $markup_id . '">';
+    $entity_form['#suffix'] = '</div>';
+
+    // Passo il delta alla chiamata ajax in modo da sapere quale form ritornare
+    if (isset($entity_form['#ief_row_delta'])){
+      $delta = $entity_form['#ief_row_delta'];
+    } else{
+      $delta = 'new';
+    }
+
+    $entity_form['field_ref_color']['und']['#ajax'] = array(
+      'event' => 'change',
+      'callback' => '_ajax_sku_by_color',
+      'wrapper' => $markup_id,
+      'method' => 'replace',
+      'effect' => 'fade',
+      '#delta' => $delta,
+    );
+
+    if (!empty($form_state['triggering_element'])) {
+      if (isset($form_state['triggering_element']['#ajax']['callback'])){
+        if ($form_state['triggering_element']['#ajax']['callback'] == '_ajax_sku_by_color'){
+
+          if (
+            isset($node_product->field_base_code['und'][0]['value']) && 
+            $node_product->field_base_code['und'][0]['value'] !== ''
+          ){
+            $base = $node_product->field_base_code['und'][0]['value'];
+          }
+
+          $value = $form_state['triggering_element']['#value'];
+          $term = taxonomy_term_load($value);
+          if (isset($term->field_color_pro['und'][0]['value'])){
+            $color = $term->field_color_pro['und'][0]['value'];
+            $color = str_replace(' ', '', $color);
+            $entity_form['sku']['#value'] = $base . $color;
+          }
+        }
+      }
+    }
+  //}
+}
+
+function _ajax_sku_by_color(&$form, &$form_state){
+  if (!empty($form_state['triggering_element'])) {
+    if (isset($form_state['triggering_element']['#ajax']['callback'])){
+      if ($form_state['triggering_element']['#ajax']['callback'] == '_ajax_sku_by_color'){
+        // Recupero il delta
+        $delta = $form_state['triggering_element']['#ajax']['#delta'];
+        // Se il delta è nuovo, il form è nell'array form
+        // Altrimenti ritorno il form di una data entità
+        if ($delta == 'new'){
+          return $form['field_ref_prod']['und']['form'];  
+        } else {
+          return $form['field_ref_prod']['und']['entities'][$delta];  
+        }
+      }
+    }
+  }
+}
+
+function _commerce_slow_alter_product_creation(&$entity_form, &$form_state){
+  $node_product = $form_state['node'];
+      
+  // Titolo default
+  if (isset($node_product->name_field['it'][0]['value']) && $node_product->name_field['it'][0]['value'] !== ''){
+    $def_title = $node_product->name_field['it'][0]['value'];
+    $entity_form['title_field']['it'][0]['value']['#default_value'] = $def_title;  
+  }
+  
+  // Taglie default
+  if (isset($node_product->field_ref_size['und'][0]['tid'])){
+    $def_tid = $node_product->field_ref_size['und'][0]['tid'];
+    $entity_form['field_ref_size']['und']['#default_value'] = $def_tid;
+  }
+
+  // Dal modello, recupero il modello per produttore
+  // Un domani sarà da riscrivere in favore di un campo testuale nel modelloe
+  if (isset($node_product->field_ref_cat['und'][0]['tid'])){
+    $c_tid = $node_product->field_ref_cat['und'][0]['tid'];
+    $cat = taxonomy_term_load($c_tid);
+    if (isset($cat->field_ref_prod_model['und'][0]['tid'])){
+      $p_tid = $cat->field_ref_prod_model['und'][0]['tid'];
+      $entity_form['field_ref_prod_model']['und']['#default_value'] = $p_tid;
+    }
+  }
+
+  // Prezzo default
+  if (
+    isset($node_product->field_default_price['und'][0]['value']) &&
+    $node_product->field_default_price['und'][0]['value'] !== 0
+  ){
+    $d_price = $node_product->field_default_price['und'][0]['value'];
+    $entity_form['commerce_price']['und'][0]['amount']['#default_value'] = $d_price;
+  }
+
+  // Codice default
+  if (
+    isset($node_product->field_base_code['und'][0]['value']) && 
+    $node_product->field_base_code['und'][0]['value'] !== ''
+  ){
+    $base_sku = $node_product->field_base_code['und'][0]['value'];
+    $entity_form['sku']['#default_value'] = $base_sku;
+  }
+}

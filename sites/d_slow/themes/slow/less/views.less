@@ -1,0 +1,64 @@
+/* less/views.less */
+
+.admin-compressed-view{
+  font-size: 14px;
+
+  .views-exposed-form .views-exposed-widget .form-submit{
+    margin-top: 30px;
+  }
+
+  label,
+  .form-control{
+    font-size: 14px;
+  }
+
+  .views-field-field-img{
+    width: 80px;
+  }
+}
+
+.feed-icon{
+  .margin-b(2);
+}
+
+// ** VISTA SPEDIZIONI **
+// ----------------------
+
+.view-id-delivery{
+
+  .views-field-commerce-customer-shipping{
+    max-width: 90px;
+  }
+
+  .views-field-commerce-shipping-service{
+    max-width: 150px;
+  }
+
+  .view-commerce-line-item-table{
+
+    table{
+      margin-bottom: 0;
+      border: 1px solid @gray-lighter;
+
+      .views-field-line-item-title{
+        max-width: 150px;
+      }  
+    }
+
+    .views-field-commerce-unit-price,
+    .views-field-commerce-total,
+    thead{
+      display: none;
+    }
+  }
+}
+
+@media print{
+  .view-id-delivery{
+    h2.text-center,
+    .views-exposed-widgets,
+    .views-field-edit-order{
+      display: none;
+    } 
+  }
+}

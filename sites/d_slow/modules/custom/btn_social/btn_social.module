@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * Hook implements hook_preprocess_node()
+ */
+function btn_social_preprocess_node(&$vars){
+  if ($vars['view_mode'] == 'full'){
+    if ($vars['type'] == 'news' || $vars['type'] == 'product'){
+      $v['link'] = url('node/' . $vars['nid'], array('absolute' => TRUE));
+
+      $social_bt = _btn_socials($v);
+
+      $vars['content']['social'] = array(
+        '#prefix' => '<ul class="btn-social clearfix">',
+        '#suffix' => '</ul>' . $social_bt['fb']['code'],
+      );
+
+      foreach ($social_bt as $key => $bt) {
+        if ($key !== 'fb'){
+          $vars['content']['social'][$key] = array(
+            '#prefix' => '<li class="li-soc li-soc-' . $key . '">',
+            '#markup' => $bt['code'],
+            '#suffix' => '</li>',
+          );
+          if (isset($bt['js'])){
+            drupal_add_js($bt['js'], array('type' => 'external', 'scope' => 'footer'));
+          }
+        }
+      }
+
+      $vars['content']['social'] = array(
+        '#prefix' => '<div class="wrapper-social margin-b-1">',
+        '#suffix' => '</div>',
+        'data' => $vars['content']['social'],
+        '#weight' => 40,
+      );
+    }
+  }
+}
+
+/**
+ * Elenco dei bottoni social
+ */
+function _btn_socials($vars){
+  $data = array(
+    'tw' => array(
+      'code' => '<a href="http://twitter.com/share" class="twitter-share-button" data-url="' . $vars['link'] .'" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>',
+    ),
+    //'pl' => array(
+    //  'code' => '<g:plusone size="medium" href="'. $vars['link'] .'"></g:plusone>',
+    //  'js' => 'https://apis.google.com/js/plusone.js',
+    //),
+    'fb' => array(
+      'code' => '<div class="fb-like" data-share="true" data-width="300" data-show-faces="false"></div>',
+      // Bisogna creare una app su FB relativa al sito web e inserire il codice in html.tpl.php
+    ),
+    'pin' => array(
+      'code' => '<a href="http://pinterest.com/pin/create/button/?url=' . $vars['link'] . '" class="pin-it-button" count-layout="horizontal">Pin It</a>',
+      'js' => 'http://assets.pinterest.com/js/pinit.js',
+    ),
+    'lk' => array(
+      'code' => '<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="' . $vars['link'] . '" data-counter="right"></script>',
+    ),
+  );
+  return $data;
+}

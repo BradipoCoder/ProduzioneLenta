@@ -1,0 +1,5 @@
+name = Bottoni social
+description = Aggiunge i bottoni social ai nodi
+package = Mekit
+core = 7.x
+version = 7.x-1.x-dev

@@ -1,0 +1,202 @@
+<?php
+
+/**
+ * Implements hook_preprocess_page();
+ * Add the countdown in the navbar
+ */
+function countdown_preprocess_page(&$vars){
+  
+  $data = _countdown_get_timing();
+  if ($data){
+    $interval = $data['interval'];
+
+    $text = '';
+    $desc = '';
+
+    if ($interval->d !== 0){
+      $text = '<span class="label label-primary">- ' . $interval->d . ' gg</span>'; 
+      $desc = $interval->d . ' giorni e ' . $interval->h . ' ore alla chiusura del prossimo lotto.';
+    } else {
+      $text = '<span class="label label-primary">Da domani in produzione!</span>';
+    }
+
+    // Mesi
+    if ($interval->m !== 0){
+      $text = '- ' . $interval->m . ' m ' . $interval->d . ' gg'; 
+      if ($interval->m == 1){
+        $desc = $interval->m . ' mese, ' . $desc;  
+      } else {
+        $desc = $interval->m . ' mesi, ' . $desc;
+      }
+    }
+
+    $opt = array(
+      'attributes' => array(
+        'data-toggle' => 'tooltip',
+        'data-placement' => 'bottom',
+        'title' => $desc,
+      ),
+      'html' => TRUE,
+    );
+
+    $vars['page']['countdown'] = array(
+      '#prefix' => '<li class="leaf">',
+      '#suffix' => '</li>',
+      '#markup' => l($text, 'node/47', $opt),
+    );  
+  }
+}
+
+/**
+ * hook_preprocess_node()
+ */
+function countdown_preprocess_node(&$vars){
+  $node = $vars['node'];
+  if ($node->nid == 47){
+    _countdown_preprocess_how_it_works($vars);
+  }
+}
+
+function _countdown_preprocess_how_it_works(&$vars){
+  if ($vars['view_mode'] == 'full'){ 
+    $vars['content']['counter'] = _countdown_create_big_counter();
+    _countdown_create_admin_content($vars);
+  }
+}
+
+/**
+ * Funzione che crea il counter grande
+ * Attenzione: è usata nel tema dentro commerce.php
+ */
+function _countdown_create_big_counter(){
+  $timing = _countdown_get_timing();
+  if ($timing){
+    $int = $timing['interval'];
+
+    $text = '-' . $int->d . ' giorni';
+    $desc = 'Alla chiusura degli ordini di questo lotto';
+    $date_text = 'Ultimo giorno per effettuare ordini';
+    if ($int->d == 1){
+      $text = '-' . $int->d . ' giorno';  
+    }
+    if ($int->d == 0){
+      $text = 'Da domani in produzione!';
+      $desc = 'Hai tempo fino a mezzanotte per rientrare in questo lotto';
+      //$date_text = ' – Lotto in produzione';
+    }
+
+    $data = array(
+      '#prefix' => '<div class="wrapper-countdown text-max-width margin-b-4"><div class="card card-lg card-no-margin">',
+      '#suffix' => '</div></div>',
+      'text' => array(
+        '#prefix' => '<h1 class="text-center margin-b-0 margin-t-05">',
+        '#suffix' => '</h1>',
+        '#markup' => $text,
+      ),
+      'desc' => array(
+        '#prefix' => '<h4 class="text-center">',
+        '#suffix' => '</h4>',
+        '#markup' => $desc,
+      ),
+      '#weight' => -1,
+    );
+
+    $n = floor(((15 - $int->d) * 10) / 15);
+    $m = 10 - $n;
+    $np = $n * 10;
+    $mp = $m * 10;
+
+    $progress = array(
+      '#prefix' => '<div class="margin-v-1"><div class="progress progress-striped active">',
+      '#suffix' => '</div></div>',
+      'done' => array(
+        '#markup' => '<div class="progress-bar progress-bar-primary " role="progressbar" aria-valuenow="' . $np . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $np . '%;"> ' . $np . ' %</div>',
+      ),
+    );
+
+    $data['progress'] = $progress;
+
+    $end  = $timing['next_limit'];
+    $date = format_date($end->format('U'),'shorter');
+    $data['end'] = array(
+      '#prefix' => '<div class="wrapper-date-end text-center">',
+      '#suffix' => '</div>',
+      '#markup' => $date_text . ': <strong><i class="fa fa-calendar"></i> ' . $date . '</strong>',
+    );
+  }
+
+  
+  return $data;
+}
+
+function _countdown_create_admin_content(&$vars){
+  global $user;
+  // Amministratori e seller
+  if (isset($user->roles[3]) || isset($user->roles[4])){
+
+    $opt = array(
+      'attributes' => array(
+        'class' => array('btn', 'btn-default'),
+      ),
+    );
+
+    $vars['content']['date'] = array(
+      '#prefix' => '<div class="text-max-width well text-center">',
+      '#suffix' => '</div>',
+      'data' => array(
+        '#markup' => l('Date lotti', 'node/57', $opt),
+      ),
+      '#weight' => 14,
+    ); 
+  }
+}
+
+/**
+ * Ritorna l'intervallo di tempo da adesso al prossimo limite
+ */
+function _countdown_get_timing(){
+
+  $now = date('Y-m-d H:m'); //T12:30:00
+  $now = new DateTime($now);
+
+  $next_limit = _countdown_get_dateset_next_limit();
+  if ($next_limit){
+    $data['interval'] = $now->diff($next_limit);
+    $data['next_limit'] = $next_limit;
+  } else {
+    $data = false;
+    global $user;
+    if (isset($user->roles[3]) || isset($user->roles[4]) ){
+      $text = 'Impostarla a questo ' . l('link', 'node/57') . '.';
+      drupal_set_message('Manca una data futura per la chiusura del lotto. ' . $text, 'warning');  
+    }
+  }
+  return $data;
+}
+
+function _countdown_get_dateset_next_limit(){
+  $node = node_load(57);
+  $ds = false;
+  $now = date('Y-m-d H:m');
+  $now = new DateTime($now);
+
+  $ds = false;
+  $limit = false;
+  if ($node){
+    if (isset($node->field_dateset['und'][0]['value'])){
+      $dateset = $node->field_dateset['und'];
+      $next = false;
+      foreach ($dateset as $key => $value) {
+        $l = new DateTime($value['value']);
+        $ds[$key]['limit'] = $l;
+        if ($now < $l && $next == false){
+          $ds[$key]['next'] = true;
+          $next = true;
+          $limit = $l;
+        }
+      }
+    }
+  }
+
+  return $limit;
+}

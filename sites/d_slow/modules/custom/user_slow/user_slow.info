@@ -1,0 +1,5 @@
+name = Slow User Form
+description = Altera il form di modifica dell'utente
+package = Produzione Lenta
+core = 7.x
+version = 7.x-1.x-dev

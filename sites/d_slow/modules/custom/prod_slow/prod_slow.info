@@ -1,0 +1,5 @@
+name = Pagina Prodotti
+description = Pagina con tutti i prodotti di Produzione Lenta
+package = Produzione Lenta
+core = 7.x
+version = 7.x-1.x-dev

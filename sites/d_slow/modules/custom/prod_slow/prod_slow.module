@@ -1,0 +1,58 @@
+<?php
+
+require('include/filter.php');
+require('include/query.php');
+
+/**
+ * Implementx hook_menu()
+ */
+
+function prod_slow_menu(){
+  $items['prodotti'] = array(
+    'page callback' => 'prod_slow_page',
+    'access arguments' => array('access content'),
+    'title' => 'Prodotti',
+  );
+  return $items;
+}
+
+function prod_slow_page(){
+
+  //_prod_slow_work_collection();
+
+  $content['filter'] = _prod_slow_page_filter();
+  $content['nodes'] = _prod_slow_page_nodes();
+  $content['pager'] = array(
+    '#theme' => 'pager',
+    '#weight' => 10
+  );
+
+  add_same_h_by_selector('.wrapper-nodes');
+
+  // Add JS
+  $js = drupal_get_path('module', 'prod_slow') . '/js/prod-slow.js';
+  drupal_add_js( $js , array('group' => JS_LIBRARY, 'weight' => 1));
+
+  $data = array(
+    '#theme' => 'prod_slow',
+    '#content' => $content,
+  );
+  return $data;
+}
+
+/**
+ * Implementes hook_theme();
+ */
+function prod_slow_theme(){
+  return array(
+    'prod_slow' => array(
+      // use a template and give the template's name.
+      'template' => 'prod-slow',
+      'variables' => array(
+        'content' => NULL,
+      ),
+      'pattern' => 'prod-slow__',
+    ),
+  );
+}
+

@@ -1,0 +1,4 @@
+name = Archivio blog
+description = Crea una serie di funzionalità per il blog
+package = Produzione Lenta
+core = 7.x

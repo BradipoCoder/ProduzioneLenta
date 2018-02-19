@@ -1,0 +1,27 @@
+name = Slow Theme
+description = Produzione Lenta Theme
+core = 7.x
+base theme = mekit
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Regions
+;;;;;;;;;;;;;;;;;;;;;
+
+regions[cart]           = 'Carrello'
+regions[wide_top]       = 'Wide top'
+regions[wide_parallax]  = 'Wide parallax'
+regions[help]           = 'Help'
+regions[content]        = 'Content'
+regions[wide_bottom]    = 'Wide bottom'
+regions[bottom]			    = 'Bottom'
+regions[footer]         = 'Footer'
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Stylesheets
+;;;;;;;;;;;;;;;;;;;;;
+
+stylesheets[all][] = less/style.less
+stylesheets[print][] = less/print.less
+
+;; JS
+scripts[] = js/slow.js

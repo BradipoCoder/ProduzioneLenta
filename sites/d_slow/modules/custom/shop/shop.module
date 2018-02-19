@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Implementx hook_menu()
+ */
+
+function shop_menu(){
+  $items['shop'] = array(
+    'page callback' => 'shop_page',
+    'access arguments' => array('access content')
+  );
+  return $items;
+}
+
+function shop_page(){
+  $data = array(
+    '#theme' => 'shop',
+    '#content' => array(),
+  );
+  return $data;
+}
+
+/**
+ * Implementes hook_theme();
+ */
+function shop_theme(){
+  return array(
+    'shop' => array(
+      // use a template and give the template's name.
+      'template' => 'shop',
+      'variables' => array(
+        'content' => NULL,
+      ),
+      'pattern' => 'shop__',
+    ),
+  );
+}
+

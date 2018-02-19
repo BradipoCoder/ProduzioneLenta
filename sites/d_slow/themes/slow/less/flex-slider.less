@@ -1,0 +1,129 @@
+/* less/flex-slider.less */
+
+// ** TO DO **
+// -----------
+// * turn off the css from the module and load the less structure from the library
+
+.flexslider{
+  border: none;
+  background: none;
+  margin: 0;
+  //overflow: hidden;
+  //background: @gray-dark;
+  .border-top-radius(0);
+  .border-bottom-radius(0);
+  .box-shadow(none);
+  .margin-b(2);
+}
+
+.flex-direction-nav a{
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0;
+
+  &:before {
+    font-family: FontAwesome;
+    font-size: 30px;
+    display: inline-block;
+    content: "\f104";
+    color: @gray-darker;
+    text-shadow: none;
+    position: relative;
+    left: -2px;
+    top: 1px;
+  }
+}
+
+.flex-direction-nav a.flex-next:before {
+  content: "\f105";
+  left: -18px;
+}
+
+.flex-control-paging{
+}
+
+.flex-control-paging li a{
+  width: 7px;
+  height: 7px;
+  background: @gray-lighter;
+  box-shadow: none;
+  &.flex-active{
+    background: @gray-dark;
+  }
+}
+
+// Custom
+.flexslider .flex-direction-nav a{
+  .transition(all ease-in-out .2s);
+  display: block;
+  opacity: 1; // Like hovering the slider (0.7)
+}
+
+
+// Nascondo le frecce nel mobile
+@media (max-width: @screen-xs-max){
+  ul.flex-direction-nav{
+    display: none;
+  }
+}
+
+.row-pagination-mobile{
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.slow-home-flex-slide{
+  position: relative;
+  .wrapper-caption{
+    //background: fade(#000, 40%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.slow-flex-caption{
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+}
+
+.flex-direction-nav li a{
+  background: #fff;
+  //.border-bottom-radius(50%);
+  //.border-top-radius(50%);
+  text-align: center;
+}
+
+
+.flex-direction-nav{
+  .flex-prev{
+    left: 0;
+  }
+  .flex-next{
+    right: 0;
+  }
+}
+
+.flexslider:hover{
+  .flex-direction-nav{
+    .flex-prev{
+      opacity: 1;
+      left: 0;
+    }
+    .flex-next{
+      opacity: 1;
+      right: 0;
+    }
+  } 
+}
+
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max){
+  .slow-flex-caption{
+    margin-right: 60px;
+    margin-left: 60px;
+  }
+}
