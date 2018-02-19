@@ -17,7 +17,7 @@ tcbl.sublime-project
 tcbl.sublime-workspace
 
 
-# DRUPAL - Configuration files containing sensitive information
+# DRUPAL - Default folders
 # -------------------------------------------------------------
 /sites/all
 /sites/private
